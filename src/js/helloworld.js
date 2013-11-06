@@ -1,4 +1,5 @@
 /** @jsx React.DOM */
+
 var TodoList = React.createClass({
   render: function() {
     var createItem = function(itemText) {
@@ -7,19 +8,30 @@ var TodoList = React.createClass({
     return <ul>{this.props.items.map(createItem)}</ul>;
   }
 });
+
 var TodoApp = React.createClass({
+  hasLocalstorage: ('localStorage' in window && window['localStorage'] !== null),
+
   getInitialState: function() {
-    return {items: [], text: ''};
+    storedItems = this.hasLocalstorage ? JSON.parse(window.localStorage['todo_items']) : [];
+    return {items: storedItems, text: ''};
   },
+
   onChange: function(e) {
     this.setState({text: e.target.value});
   },
+
   handleSubmit: function(e) {
     e.preventDefault();
     var nextItems = this.state.items.concat([this.state.text]);
     var nextText = '';
+
+    if (this.hasLocalstorage)
+      window.localStorage['todo_items'] = JSON.stringify(nextItems);
+
     this.setState({items: nextItems, text: nextText});
   },
+
   render: function() {
     return (
       <div>
